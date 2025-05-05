@@ -1,0 +1,54 @@
+import pandas as pd
+from mlxtend.frequent_patterns import apriori, association_rules
+from mlxtend.preprocessing import TransactionEncoder
+
+# Dataset 1: Groceries data
+
+dataset1 = [['milk', 'bread', 'eggs'],
+           ['milk', 'bread'],
+           ['milk', 'eggs'],
+           ['bread', 'eggs'],
+           ['milk', 'bread', 'eggs'],
+           ['milk', 'bread']]
+
+te = TransactionEncoder()
+te_ary = te.fit(dataset1).transform(dataset1)
+df1 = pd.DataFrame(te_ary, columns=te.columns_)
+
+
+# Dataset 2: Online Retail data
+
+dataset2 = [['laptop', 'mouse'],
+           ['laptop', 'mouse', 'keyboard'],
+           ['laptop', 'headphones'],
+           ['laptop', 'mouse', 'headphones'],
+           ['keyboard', 'mouse'],
+           ['laptop', 'keyboard']]
+
+te2 = TransactionEncoder()
+te_ary2 = te2.fit(dataset2).transform(dataset2)
+df2 = pd.DataFrame(te_ary2, columns=te2.columns_)
+
+
+# Apriori + Association Rules Function
+
+def run_apriori(df, min_support, min_confidence, dataset_name):
+    print(f"\n====== Results for {dataset_name} ======")
+    print(f"Min Support = {min_support}, Min Confidence = {min_confidence}")
+
+    frequent_itemsets = apriori(df, min_support=min_support, use_colnames=True)
+    print("\nFrequent Itemsets:\n", frequent_itemsets)
+
+    rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=min_confidence)
+    rules = rules[['antecedents', 'consequents', 'support', 'confidence', 'lift']]
+    print("\nAssociation Rules:\n", rules)
+
+
+
+# A) Support = 50%, Confidence = 75%
+run_apriori(df1, 0.5, 0.75, "Dataset 1 - Groceries (50%/75%)")
+run_apriori(df2, 0.5, 0.75, "Dataset 2 - Online Retail (50%/75%)")
+
+# B) Support = 60%, Confidence = 60%
+run_apriori(df1, 0.6, 0.6, "Dataset 1 - Groceries (60%/60%)")
+run_apriori(df2, 0.6, 0.6, "Dataset 2 - Online Retail (60%/60%)")
