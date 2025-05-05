@@ -1,0 +1,50 @@
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import StandardScaler, Binarizer
+ 
+df = pd.DataFrame({
+    "Sno.": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    "Name": ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
+    "age": [35, 40, 45, 32, 54, 33, 43, 26, 25, 60],
+    "salary": [80000, 60000, 50000, 57000, 120000, 52000, 75000, 65000, 48000, 110000],
+    "Purchase_amount": [200, 250, 180, 95, 300, 90, 100, 270, 145, 280]
+})
+
+print("Original DataFrame:\n", df)
+
+# 1. Transformation
+
+df['purchase%'] = (df['Purchase_amount'] / df['salary']) * 100
+print("\nAfter Transformation (Purchase%):\n", df[['Name', 'Purchase_amount', 'salary', 'purchase%']])
+
+
+# 2. Standardization – Salary
+
+df[['salary']] = StandardScaler().fit_transform(df[['salary']])
+print("\nAfter Standardization (salary):\n", df[['Name', 'salary']])
+
+
+# 3. Binarization – Purchase Amount > 200
+
+df[['Purchase_amount']] = Binarizer(threshold=200).fit_transform(df[['Purchase_amount']])
+print("\nAfter Binarization (Purchase_amount > 200):\n", df[['Name', 'Purchase_amount']])
+
+
+# 4. Sampling – Random sample of 4 rows
+
+sample_df = df.sample(n=4, random_state=1)
+print("\nRandom Sample (4 records):\n", sample_df)
+
+
+# 5. Discretization – Age into 4 groups
+
+labels = ['young', 'adult', 'senior', 'super_senior']
+df['age_group'] = pd.cut(df['age'], bins=4, labels=labels)
+print("\nAfter Discretization (Age groups):\n", df[['Name', 'age', 'age_group']])
+
+
+# 6. Aggregation – Mean values by age group
+
+agg_df = df.groupby('age_group', observed=False)[['purchase%', 'salary']].mean().reset_index()
+
+print("\nAggregation – Average Purchase% and Standardized Salary by Age Group:\n", agg_df)
