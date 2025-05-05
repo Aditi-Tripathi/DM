@@ -1,0 +1,47 @@
+import pandas as pd
+import numpy as np
+from sklearn.datasets import load_iris
+
+iris = load_iris(as_frame = True )
+df = iris.frame
+
+print(df.isnull().sum())
+
+df["Species"] = iris.target
+print('\n', iris.target_names)
+df["Species" ] = df["Species" ].map({0 : "setosa" , 1 :  'versicolor' , 2 : "virginica" })
+
+np.random.seed(3)
+df.loc[np.random.choice(df.index, 6) , 'petal length (cm)'] = np.nan
+df.loc[np.random.choice(df.index, 3), 'Species'] = np.nan
+df.loc[5, 'sepal length (cm)'] = np.nan
+df.loc[10, 'sepal width (cm)'] = 12.0
+df.loc[20,'Species'] = 'setsoa'
+       
+print('\n', df.isnull().sum())
+
+#df = df.dropna
+df['Species'].str.lower()
+df['petal length (cm)'].fillna(df['petal length (cm)'].mean() , inplace = True)
+df['sepal length (cm)'].fillna(df['sepal length (cm)'].mean() , inplace = True)
+df ['Species'].fillna(df ['Species'].mode(), inplace = True)
+df["Species"] = df["Species"].replace('setsoa', 'setosa')
+
+Q1 = df['sepal width (cm)'].quantile(0.25)
+Q3 = df['sepal width (cm)'].quantile(0.75)
+IRQ = Q3 - Q1
+l = Q1 - 1.5*IRQ
+U = Q3 + 1.5*IRQ
+df = df[(df['sepal width (cm)'] >= l) | (df['sepal width (cm)'] <= U)]
+
+print('\n', df.isnull().sum())
+print('\n', df.describe())
+print('\n', df['Species'].unique())
+
+
+
+
+
+
+
+
